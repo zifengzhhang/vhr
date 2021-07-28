@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.javaboy.vhr.mapper.RoleMapper" >
+  <resultMap id="BaseResultMap" type="com.javaboy.vhr.pojo.Role" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="name" property="name" jdbcType="VARCHAR" />
+    <result column="nameZh" property="nameZh" jdbcType="VARCHAR" />
+  </resultMap>
+  <resultMap id="MenuWithChildren" type="com.javaboy.vhr.pojo.Menu" extends="BaseResultMap">
+    <id column="id" property="id"></id>
+    <result column="name" property="name"></result>
+    <collection property="children" ofType="com.javaboy.vhr.pojo.Menu">
+      <id column="id2" property="id"></id>
+      <result column="name2" property="name"></result>
+      <collection property="children" ofType="com.javaboy.vhr.pojo.Menu">
+        <id column="id3" property="id"></id>
+        <result column="name3" property="name"></result>
+      </collection>
+    </collection>
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, name, nameZh
+  </sql>
+  <select id="getAllMenus" resultMap="MenuWithChildren">
+    SELECT m1.`id` AS id, m1.`name` AS NAME, m2.`id` AS id2, m2.`name` AS name2,
+m3.`id` AS id3, m3.`name` AS name3
+FROM menu m1, menu m2, menu m3
+WHERE m1.`id`= m2.`parentId` AND m2.`id` = m3.`parentId` AND m3.enabled = TRUE ORDER BY m1.`id`, m2.`id`, m3.`id`
+
+  </select>
+  <select id="getAllRoles" resultMap="BaseResultMap">
+    select * from role
+  </select>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from role
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from role
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.javaboy.vhr.pojo.Role" >
+    insert into role (id, name, nameZh
+      )
+    values (#{id,jdbcType=INTEGER}, #{name,jdbcType=VARCHAR}, #{nameZh,jdbcType=VARCHAR}
+      )
+  </insert>
+  <insert id="insertSelective" parameterType="com.javaboy.vhr.pojo.Role" >
+    insert into role
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        id,
+      </if>
+      <if test="name != null" >
+        name,
+      </if>
+      <if test="nameZh != null" >
+        nameZh,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="name != null" >
+        #{name,jdbcType=VARCHAR},
+      </if>
+      <if test="nameZh != null" >
+        #{nameZh,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.javaboy.vhr.pojo.Role" >
+    update role
+    <set >
+      <if test="name != null" >
+        name = #{name,jdbcType=VARCHAR},
+      </if>
+      <if test="nameZh != null" >
+        nameZh = #{nameZh,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.javaboy.vhr.pojo.Role" >
+    update role
+    set name = #{name,jdbcType=VARCHAR},
+      nameZh = #{nameZh,jdbcType=VARCHAR}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+</mapper>
